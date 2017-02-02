@@ -1,0 +1,229 @@
+package com.isp.nbp.service;
+
+import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import com.isp.databean.DataBean;
+import com.isp.wsrr.utility.WSRRUtility;
+
+//Versione 1.0 Febbraio 2017 Primeur RG
+
+@Path("/RequestData/")
+public class GetProviderFromEndpointResource {
+
+	@POST
+	// @Consumes("text/plain")
+	@Path("/endpointURI")
+
+	public String serch(String userData)
+			throws URISyntaxException, ClassNotFoundException, InstantiationException, IllegalAccessException {
+
+		String requiredURI = null;
+		String resultQuery = null;
+		WSRRUtility wsrrutility = new WSRRUtility();
+		List<DataBean> list = new ArrayList<DataBean>();
+		boolean callInerror = false;
+
+		String wsrrTarget = System.getProperty("LIBLKPWSRRURL");
+		String wsrrTargetUser = System.getProperty("LIBLKPWSRRUSER");
+		String wsrrTargetPassword = System.getProperty("LIBLKPWSRRPASSWORD");
+
+		System.out.println("Server - " + wsrrTarget);
+		
+		//wsrrTarget=null;
+
+		if (wsrrTarget != null && wsrrTarget.length() != 0) {
+
+			try {
+				JSONObject jsonInp = new JSONObject(userData);
+
+				requiredURI = ((String) jsonInp.get("service_input_URI")).trim();
+
+				if (requiredURI != null && (!requiredURI.equals("AboutServiceVersion") & requiredURI.trim().length() !=0 )) {
+
+					resultQuery = wsrrutility.getProducerFromEndpointByUriNoSecurity(".*" + requiredURI, wsrrTarget,
+							wsrrTargetUser, wsrrTargetPassword);
+
+					if (resultQuery != null && !resultQuery.contains("chiamata_in_errore")) {
+
+						// query by EndPoint
+						JSONArray jsa = new JSONArray(resultQuery);
+
+						JSONArray jsaint = null;
+						JSONObject jso = null;
+
+						for (int i = 0; i < jsa.length(); i++) {
+							String name = null;
+							String abilitazione = null;
+							jsaint = jsa.getJSONArray(i);
+							for (int ii = 0; ii < jsaint.length(); ii++) {
+								jso = (JSONObject) jsaint.get(ii);
+
+								if (jso.getString("name").equals("name")) {
+									name = (String) jso.getString("value");
+								}
+								if (jso.getString("name").equals("gep63_ABILITAZ_INFRASTR")) {
+
+									if (!jso.isNull("value"))
+										abilitazione = (String) jso.get("value");
+									else
+										abilitazione = "";
+								}
+							}
+							DataBean dbean = new DataBean();
+							dbean.setService_input_name(name);
+							dbean.setCodice_abilitativo(abilitazione);
+							list.add(dbean);
+
+						}
+
+						// query by EndPointProxy SOAPProxy
+						resultQuery = wsrrutility.getProducerFromEndpointByUriFromProxyService(".*" + requiredURI,
+								"SOAP", wsrrTarget, wsrrTargetUser, wsrrTargetPassword);
+
+						if (resultQuery != null && !resultQuery.contains("chiamata_in_errore")) {
+
+							jsa = new JSONArray(resultQuery);
+
+							for (int i = 0; i < jsa.length(); i++) {
+								String name = null;
+								String abilitazione = null;
+								jsaint = jsa.getJSONArray(i);
+								for (int ii = 0; ii < jsaint.length(); ii++) {
+									jso = (JSONObject) jsaint.get(ii);
+									if (jso.getString("name").equals("name")) {
+										name = (String) jso.getString("value");
+									}
+									if (jso.getString("name").equals("gep63_ABILITAZ_INFRASTR")) {
+										if (!jso.isNull("value"))
+											abilitazione = (String) jso.get("value");
+										else
+											abilitazione = "";
+									}
+								}
+								DataBean dbean = new DataBean();
+								dbean.setService_input_name(name);
+								dbean.setCodice_abilitativo(abilitazione);
+								list.add(dbean);
+
+							}
+
+							// query by EndPointProxy REST
+							resultQuery = wsrrutility.getProducerFromEndpointByUriFromProxyService(".*" + requiredURI,
+									"REST", wsrrTarget, wsrrTargetUser, wsrrTargetPassword);
+
+							if (resultQuery != null && !resultQuery.contains("chiamata_in_errore")) {
+
+								jsa = new JSONArray(resultQuery);
+
+								for (int i = 0; i < jsa.length(); i++) {
+									String name = null;
+									String abilitazione = null;
+									jsaint = jsa.getJSONArray(i);
+									for (int ii = 0; ii < jsaint.length(); ii++) {
+										jso = (JSONObject) jsaint.get(ii);
+										if (jso.getString("name").equals("name")) {
+											name = (String) jso.getString("value");
+										}
+										if (jso.getString("name").equals("gep63_ABILITAZ_INFRASTR")) {
+											if (!jso.isNull("value"))
+												abilitazione = (String) jso.get("value");
+											else
+												abilitazione = "";
+										}
+									}
+									DataBean dbean = new DataBean();
+									dbean.setService_input_name(name);
+									dbean.setCodice_abilitativo(abilitazione);
+									list.add(dbean);
+
+								}
+
+								// query by EndPointProxy CALLABLE
+								resultQuery = wsrrutility.getProducerFromEndpointByUriFromProxyService(
+										".*" + requiredURI, "CALLABLE", wsrrTarget, wsrrTargetUser, wsrrTargetPassword);
+
+								if (resultQuery != null && !resultQuery.contains("chiamata_in_errore")) {
+
+									jsa = new JSONArray(resultQuery);
+
+									for (int i = 0; i < jsa.length(); i++) {
+										String name = null;
+										String abilitazione = null;
+										jsaint = jsa.getJSONArray(i);
+										for (int ii = 0; ii < jsaint.length(); ii++) {
+											jso = (JSONObject) jsaint.get(ii);
+											if (jso.getString("name").equals("name")) {
+												name = (String) jso.getString("value");
+											}
+											if (jso.getString("name").equals("gep63_ABILITAZ_INFRASTR")) {
+												if (!jso.isNull("value"))
+													abilitazione = (String) jso.get("value");
+												else
+													abilitazione = "";
+											}
+										}
+										DataBean dbean = new DataBean();
+										dbean.setService_input_name(name);
+										dbean.setCodice_abilitativo(abilitazione);
+										list.add(dbean);
+
+									}
+
+								} else
+									callInerror = true;
+
+							} else
+								callInerror = true;
+
+						} else
+							callInerror = true;
+
+					} else
+						callInerror = true;
+				} else {
+					callInerror = true;
+					if ( requiredURI.trim().length()==0){
+						resultQuery = "{\"chiamata_in_errore \":\"Attenzione non è possibile specificare una URI vuota\"}";
+					} else {
+						resultQuery = "{\"aboutLib \":\"Versione 1.0 Gennaio 2017\"}";
+					}
+				}
+
+			} ///
+
+			catch (Exception ex) {
+
+				callInerror = true;
+
+				resultQuery = "{\"chiamata_in_errore\":\"" + ex.getMessage() + "\"}";
+
+			}
+
+		} else {
+
+			callInerror = true;
+			resultQuery = "{\"chiamata_in_errore\":\"Specificare un valore per la variabile di ambiente :LIBLKPWSRRURL\"}";
+
+		}
+
+		if (!callInerror) {
+
+			JSONArray jsonout = new JSONArray(list);
+			resultQuery = jsonout.toString();
+
+		}
+
+		System.out.println("Input : " + userData + " Result : " + resultQuery);
+		return resultQuery;
+
+	}
+
+}
